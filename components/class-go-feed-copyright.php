@@ -9,10 +9,24 @@ class GO_Feed_Copyright
 	 */
 	public function __construct()
 	{
+		add_action( 'wp', array( $this, 'wp' ) );
 		add_action( 'go_feed_copyright_remove', array( $this, 'remove' ) );
-		add_filter( 'the_content_feed', array( $this, 'the_content_feed' ) );
-		add_filter( 'the_permalink', array( $this, 'the_permalink' ) );
 	}//end __construct
+
+	/**
+	 * hooked to wp action. If we're on a feed, hook all the things
+	 */
+	public function wp()
+	{
+		if ( ! is_feed() )
+		{
+			return;
+		}//end if
+
+		add_filter( 'the_permalink', array( $this, 'the_permalink' ) );
+		add_filter( 'the_content_feed', array( $this, 'the_content_feed' ) );
+		add_filter( 'the_excerpt_rss', array( $this, 'the_content_feed' ) );
+	}//end wp
 
 	/**
 	 * loads config settings
@@ -65,6 +79,7 @@ class GO_Feed_Copyright
 	public function remove()
 	{
 		remove_filter( 'the_content_feed', array( $this, 'the_content_feed' ) );
+		remove_filter( 'the_excerpt_rss', array( $this, 'the_content_feed' ) );
 		remove_filter( 'the_permalink', array( $this, 'the_permalink' ) );
 	}//end remove
 }//end class
